@@ -23,12 +23,13 @@ from langchain.prompts import (
 
 from typing import List, Any
 from utils import BaseLogger, extract_title_and_question
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 
 def load_embedding_model(embedding_model_name: str, logger=BaseLogger(), config={}):
     if embedding_model_name == "ollama":
         embeddings = OllamaEmbeddings(
-            base_url=config["ollama_base_url"], model="llama2"
+            base_url=config["ollama_base_url"], model="llama3"
         )
         dimension = 4096
         logger.info("Embedding: Using Ollama")
@@ -40,6 +41,12 @@ def load_embedding_model(embedding_model_name: str, logger=BaseLogger(), config=
         embeddings = BedrockEmbeddings()
         dimension = 1536
         logger.info("Embedding: Using AWS")
+    elif embedding_model_name == "google-genai-embedding-001":        
+        embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/embedding-001"
+        )
+        dimension = 768
+        logger.info("Embedding: Using Google Generative AI Embeddings")
     else:
         embeddings = SentenceTransformerEmbeddings(
             model_name="all-MiniLM-L6-v2", cache_folder="/embedding_model"
